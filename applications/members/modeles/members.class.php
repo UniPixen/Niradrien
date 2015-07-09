@@ -1,5 +1,7 @@
 <?php
 	class members extends base {
+		public $uploadFileDirectory;
+		public $foundRows = 0;
 		public $avatarError = false;
 		public $homeimageError = false;
 		public $membersWhere = '';
@@ -13,26 +15,26 @@
 
 		public function getAll($start = 0, $limit = 0, $where = '', $order = 'username ASC') {
 			global $mysql;
-
+			
 			$limitQuery = '';
-
+			
 			if ($limit != 0) {
 				$limitQuery = " LIMIT $start, $limit ";
 			}
-
+			
 			if ($where != '') {
-				$where = " WHERE " . $where;
+				$where = "WHERE " . $where;
 			}
 
 			$a = $mysql->query("
-				SELECT *,
+				SELECT SQL_CALC_FOUND_ROWS *,
 				(SELECT COUNT(follow_id) FROM members_followers WHERE follow_id = members . member_id) AS followers,
 				(SELECT COUNT(id) FROM products WHERE member_id = members . member_id && status = 'active') as products
 				FROM members
 				$where
 				ORDER BY $order
 				$limitQuery
-			");
+			", __FUNCTION__ );
 
 			if ($mysql->num_rows() == 0) {
 				return false;
@@ -95,7 +97,7 @@
 				$b = $mysql->query("
 					SELECT *
 					FROM countries
-					WHERE id = '" . intval($d['country_id']) . "'
+					WHERE id = " . intval($d['country_id']) . "
 				");
 
 				$return[$d['member_id']]['country'] = $mysql->fetch_array($b);
@@ -103,7 +105,7 @@
 				$b = $mysql->query("
 					SELECT *
 					FROM members_status
-					WHERE member_id = '" . intval($d['member_id']) . "'
+					WHERE member_id = " . intval($d['member_id']) . "
 				");
 
 				if ($mysql->num_rows($b) > 0) {
@@ -113,8 +115,17 @@
 				}
 			}
 
-			$this->foundRows = $mysql->getFoundRows();;
+			$mysql->query("
+				SELECT SQL_CALC_FOUND_ROWS *,
+				(SELECT COUNT(follow_id) FROM members_followers WHERE follow_id = members . member_id) AS followers,
+				(SELECT COUNT(id) FROM products WHERE member_id = members . member_id && status = 'active') as products
+				FROM members
+				$where
+				ORDER BY $order
+				$limitQuery
+			", __FUNCTION__ );
 
+			$this->foundRows = $mysql->getFoundRows();
 			return $return;
 		}
 
