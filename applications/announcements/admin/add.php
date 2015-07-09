@@ -4,6 +4,7 @@
 
 	require_once ROOT_PATH . '/applications/announcements/modeles/announcements.class.php';
 	$announcements = new announcements();
+	abr('announcementType', 'authors');
 	
 	if (isset($_POST['add'])) {
 		$status = $announcements->add();
