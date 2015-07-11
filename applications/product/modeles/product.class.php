@@ -857,7 +857,7 @@
 					description_en = '" . sql_quote($_POST['description_en']) . "',
 					free_request = '" . sql_quote($_POST['free_request']) . "',
 					$setQuery
-					categories = '" . sql_quote($categories) . "'
+					categories = '" . sql_quote($categories) . "',
 					demo_url = '" . sql_quote($_POST['demo_url']) . "'
 				WHERE id = '" . intval($id) . "'
 				LIMIT 1
