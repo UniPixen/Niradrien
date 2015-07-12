@@ -21,14 +21,20 @@
 			$topicID = $_POST['topic_id'];
 			$topicName = $_POST['subject'];
 
-			$newThread = $forumClass->addThread();
-			
-			if ($newThread === true && strlen($topicName) > 8) {
-				refresh('/forum/thread/' . url($topicName) . '/' . $topicID, $langArray['complete_add_thread'], 'complete');
+			if (strlen($topicName) > 8) {
+				$newThread = $forumClass->addThread();
+
+				if (isset($newThread)) {
+					refresh('/forum/thread/' . url($topicName) . '/' . $newThread, $langArray['complete_add_thread'], 'complete');
+				}
+
+				else {
+					addErrorMessage($langArray['error_new_thread'], '', 'error');
+				}
 			}
 
 			else {
-				addErrorMessage($langArray['error_new_thread'], '', 'error');
+				addErrorMessage($langArray['error_thread_name_too_short'], '', 'error');
 			}
 		}
 	}
