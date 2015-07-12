@@ -45,7 +45,7 @@
 					$langArray['email_no_spam']
 				);
 
-				$emailClass->to($support_email);
+				$emailClass->to($meta['report_mail']);
 				$emailClass->send();
 
 				refresh('/become-author', $langArray['request_invitation_sent'], 'complete');
