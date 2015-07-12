@@ -384,7 +384,7 @@
 				)
 			");
 
-			return true;
+			return $mysql->insert_id();
 		}
 
 		public function delete($id) {
