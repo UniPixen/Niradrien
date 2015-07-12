@@ -14,12 +14,12 @@
         </div>
     {/if}
 
-    {if $product.free_file == 'true' && $smarty.session.member.member_id != $product.member_id}
+    {if $product.free_file == 'true' && check_login_bool() && $smarty.session.member.member_id != $product.member_id || !check_login_bool()}
         <div id="fichier-gratuit" class="attribut-fichier">
             {if check_login_bool()}
-                <a href="/account/download/{$product.id}" class="btn btn-big-shadow"><i class="hd-cloud-download"></i> {$lang.download_free}</a>
+                <a href="/account/download/free_file_of_the_month" class="btn btn-big-shadow"><i class="hd-cloud-download"></i> {$lang.download_free}</a>
                 {$lang.this_file_is} <strong>{$lang.free_file_of} {$smarty.now|date_format:"%B"}.</strong><br />
-                {$lang.eligible_to} <a href="/account/download/{$product.id}">{$lang.a_regular_licence}</a>.
+                {$lang.eligible_to} <a href="/licenses">{$lang.a_regular_licence}</a>.
             {else}
                 <button type="submit" class="btn btn-big-shadow"><i class="hd-cloud-download"></i> {$lang.download_free}</button>
                 {$lang.this_file_is} <strong>{$lang.free_file_of} {$smarty.now|date_format:"%B"}.</strong><br />
