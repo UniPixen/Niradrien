@@ -11,8 +11,14 @@
 	$ordersClass = new orders();
 
 	$code_achat = get_id(2);
-	$getProductID = $ordersClass->buyedProductID($code_achat);
-	$productID = $productClass->get($getProductID);
+
+	if ($code_achat == 'free_file_of_the_month') {
+		$productID = $freeItem['id'];
+	}
+
+	else {
+		$getProductID = $ordersClass->buyedProductID($code_achat);
+	}
 
 	require_once ROOT_PATH . 'applications/members/modeles/members.class.php';
 	$membersClass = new members();
@@ -20,7 +26,7 @@
 	$members = $membersClass->getAll(0, 0, $productClass->membersWhere);
 	abr('members', $members);
 
-	if ($code_achat) {
+	if ($code_achat && $code_achat != 'free_file_of_the_month') {
 		require_once ROOT_PATH . '/applications/product/modeles/product.class.php';
 		$productClass = new product();
 
@@ -100,12 +106,12 @@
 						$this->SetX(50);
 						$this->SetTextColor(66, 66, 66);
 						$this->SetFont('Avenir', '', 20);
-						$this->Cell(55, '', iconv('UTF-8', 'CP1252', 'Thesis'), 0, 1, 'L');
+						$this->Cell(55, '', iconv('UTF-8', 'CP1252', 'hadrien'), 0, 1, 'L');
 						
-						$this->SetX(72);
+						$this->SetX(75);
 						$this->SetTextColor(175, 210, 61);
 						$this->SetFont('Avenir', '', 20);
-						$this->Cell(55, '', iconv('UTF-8', 'CP1252', 'Fusion'), 0, 1, 'L');
+						$this->Cell(55, '', iconv('UTF-8', 'CP1252', 'design'), 0, 1, 'L');
 
 						$this->SetY(30);
 						$this->SetTextColor(191, 191, 191);
@@ -209,7 +215,6 @@
 				$pdfClass->afficher($langArray['product_id'], $ordersClass->row['product_id']);
 				$pdfClass->afficher($langArray['paid_price'], money_format('%i', $ordersClass->row['price']));
 				$pdfClass->afficher($langArray['purchase_key'], $ordersClass->row['code_achat']);
-				$pdfClass->afficher(‘yourtext’, ‘othertext’);
 				
 				$pdfClass->Output($meta['website_title'] . ' - ' . $langArray['license_certificate'] . ' #' . $ordersClass->row['id'] . '.pdf', 'D');
 				die();
@@ -220,7 +225,7 @@
 			}
 		}
 
-		if (($ordersClass->buyedProductID($code_achat) || $product['free_file'] == 'true') && $product['status'] == 'active') {
+		if (($ordersClass->buyedProductID($code_achat)) && $product['status'] == 'active') {
 			if (file_exists(DATA_SERVER_PATH . 'uploads/products/' . $product['id'] . '/' . $product['main_file'])) {
 				$mysql->query("
 					UPDATE orders
@@ -267,7 +272,54 @@
 		}
 	}
 
-	$product = $ordersClass->getAllBuyed(" o.member_id = '" . intval($_SESSION['member']['member_id']) . "' AND o.paid = 'true' AND o.type = 'buy'");
+	if ($code_achat && $code_achat == 'free_file_of_the_month') {
+		require_once ROOT_PATH . '/applications/product/modeles/product.class.php';
+		$productClass = new product();
+
+		$product = $productClass->get($productID);
+		
+		if ($product['free_file'] == 'true' && $product['status'] == 'active') {
+			if (file_exists(DATA_SERVER_PATH . 'uploads/products/' . $product['id'] . '/' . $product['main_file'])) {
+				$nom_product = $product['name'];
+
+				$fileInfo = pathinfo(DATA_SERVER_PATH . 'uploads/products/' . $product['id'] . '/' . $product['main_file']);
+
+				$mimeTypes = array (
+					'zip' => 'application/zip'
+				);
+
+				if (isset($mimeTypes[$fileInfo['extension']])) {
+					header('Content-Type: ' . $mimeTypes[$fileInfo['extension']]);
+				}
+				else {
+					header('Content-Type: application/octet-stream');
+				}
+
+				header('Content-Disposition: attachment; filename="hadriendesign-' . $product['id'] . '-' . smarty_modifier_url($nom_product). '-' . $_SESSION['member']['member_id'] . '.zip"');
+				header("Content-Length:" . filesize(DATA_SERVER_PATH . '/uploads/products/' . $product['id'] . '/' . $product['main_file']));
+				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+				header('Pragma: public');
+				header('Content-Transfer-Encoding: binary');
+				header('Expires: 0');
+				header('Content-Description: ' . $config['domain'] . ' Download');
+				@ob_clean();
+				@flush();
+
+				readfile(DATA_SERVER_PATH . '/uploads/products/' . $product['id'] . '/' . $product['main_file']) or die('ERROR !');
+
+				die();
+			}
+			else {
+				addErrorMessage($langArray['downloads_file_not_found'], '', 'error');
+			}
+		}
+		
+		else {
+			include_once (ROOT_PATH . '/applications/error/controles/index.php');
+		}
+	}
+
+	$product = $ordersClass->getAllBuyed(" o.member_id = " . intval($_SESSION['member']['member_id']) . " AND o.paid = 'true' AND o.type = 'buy'");
 	abr('product', $product);
 
 	if ($product) {
