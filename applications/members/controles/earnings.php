@@ -399,7 +399,7 @@
 	abr('saleIndex', $saleIndex);
 
 	// OBTENIR LES REVENUS DE PARRAINAGE
-	$referals = $ordersClass->getAll(" paid = 'true' AND type = 'referal' AND owner_id = '" . intval($member['member_id']) . "' ", "paid_datetime ASC");
+	$referals = $ordersClass->getAll(START, LIMIT, " paid = 'true' AND type = 'referal' AND owner_id = '" . intval($member['member_id']) . "' ", "paid_datetime ASC");
 	if (is_array($referals)) {
 		$ordersData = array();
 		
