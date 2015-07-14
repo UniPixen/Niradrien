@@ -51,8 +51,8 @@
 			</div>
 			<div class="stats-box span4">
 				{$lang.total_earning} :
-				<h4>{$earnings.total|string_format:"%.2f"} {$currency.symbol}</h4>
-				<span>{$lang.on_a_total_of} {$earnings.sales} {$lang.sales|@lower}</span>
+				<h4>{$member.total|string_format:"%.2f"} {$currency.symbol}</h4>
+				<span>{$lang.on_a_total_of} {$member.sales} {$lang.sales|@lower}</span>
 			</div>
 		</div>
 
