@@ -61,7 +61,7 @@
 	$codes = urlencode($codes);
 	$datas = urlencode($datas);
 
-	$get_f = file('http://script.starpass.fr/check_php.php?ident=' . $ident . '&codes=' . $codes . '&DATAS=' . $datas);
+	$get_f = file('https://script.starpass.fr/check_php.php?ident=' . $ident . '&codes=' . $codes . '&DATAS=' . $datas);
 	
 	if (!$get_f) {
 		exit ('Votre serveur n\'a pas accès au serveur de StarPass, merci de contacter votre hébergeur.');
@@ -71,7 +71,7 @@
 
 	if (is_array($tab)) {
 		if (!$tab[1]) {
-			$url = 'http://script.starpass.fr/error.php';
+			$url = 'https://script.starpass.fr/error.php';
 		}
 
 		else {
